@@ -1,0 +1,184 @@
+Sub PDF()
+'Gerar ordem de serviço
+Dim Caminho As String
+Dim Nome    As String
+Dim linha   As Long
+
+
+sheets("cach").Select
+   Cells.Select
+   ActiveSheet.Range("$A$3:$C$110").AutoFilter Field:=1
+   ActiveSheet.Range("$A$3:$C$70").AutoFilter Field:=1, Criteria1:="<>"
+    Cells.Select
+    
+sheets("barra").Select
+    Cells.Select
+    ActiveSheet.Range("$A$3:$C$110").AutoFilter Field:=1
+    ActiveSheet.Range("$A$3:$C$70").AutoFilter Field:=1, Criteria1:="<>"
+    Cells.Select
+    
+    If sheets("cach").Range("C2") = 0 And sheets("barra").Range("C2") = 0 Then
+ 
+        sheets(Array("pedidos", "exped", "crav" _
+        )).Select
+    
+'Caminho = ThisWorkbook.Path & Application.PathSeparator
+Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
+Nome = sheets("ent").Range("K30").Value2
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
+          Caminho & Nome, Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
+        False
+    
+           ElseIf sheets("cach").Range("C2") = 0 Then
+         sheets(Array("pedidos", "exped", "crav", "barra" _
+        )).Select
+    sheets("pedidos").Activate
+'Caminho = ThisWorkbook.Path & Application.PathSeparator
+Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
+Nome = sheets("ent").Range("K30").Value2
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
+          Caminho & Nome, Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
+        False
+
+ElseIf sheets("barra").Range("C2") = 0 Then
+        sheets(Array("pedidos", "exped", "crav", "cach" _
+        )).Select
+    sheets("pedidos").Activate
+'Caminho = ThisWorkbook.Path & Application.PathSeparator
+Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
+Nome = sheets("ent").Range("K30").Value2
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
+          Caminho & Nome, Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
+        False
+
+Else
+sheets(Array("pedidos", "exped", "crav", "cach", "barra" _
+        )).Select
+    
+    sheets("pedidos").Activate
+Range("A1").Select
+'Caminho = ThisWorkbook.Path & Application.PathSeparator
+Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
+Nome = sheets("ent").Range("K30").Value2
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
+          Caminho & Nome, Quality:=xlQualityStandard, _
+        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
+        False
+sheets("ent").Select
+Range("C2").Select
+
+End If
+
+'Fim da ordem de serviço
+sheets("ent").Select
+Range("C2").Select
+
+carryOn = MsgBox("Continuar?", vbYesNo, "Gravar Histórico")
+If carryOn = vbYes Then
+    Workbooks.Open fileName:= _
+    "A:\OneDrive\Documentos\hist_vendas_2024.xlsm"
+       sheets("Historico").Select
+       Range("A1:I1").Select
+    Selection.AutoFilter
+    Range("A1:I1").Select
+    Selection.AutoFilter
+     
+     Windows("Daniel.xlsb").Activate
+ sheets("ent").Select
+    If IsEmpty(Range("A16")) Then
+           Range("A15:C15").Select
+    Selection.Copy
+    ActiveWindow.ActivateNext
+    Windows("hist_vendas_2024.xlsm").Activate
+    Range("F1").End(xlDown).Offset(1, 0).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
+        True, Transpose:=False
+      Range("I2").Select
+      Selection.Copy
+        Range("H2").End(xlDown).Offset(0, 1).Select
+    Selection.PasteSpecial Paste:=xlPasteFormulas, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+        
+    Windows("Daniel.xlsb").Activate
+    sheets("ent").Select
+    Range("m15:q15").Select
+    Selection.Copy
+    Range("C1").Select
+    ActiveWindow.ActivateNext
+   Windows("hist_vendas_2024.xlsm").Activate
+    sheets("Historico").Select
+    Range("A1").End(xlDown).Offset(1, 0).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
+        True, Transpose:=False
+
+    Else
+'   Copiar quando tem vários itens
+'      Sheets("entrada").Select
+    Range("A15", Range("A15").End(xlDown).Offset(0, 2)).Select
+    Selection.Copy
+    ActiveWindow.ActivateNext
+    Workbooks.Open fileName:= _
+    "A:\OneDrive\Documentos\hist_vendas_2024.xlsm"
+            sheets("Historico").Select
+    Range("F3").End(xlDown).Offset(1, 0).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=True, Transpose:=False
+    Range("F2").End(xlDown).Offset(1, 0).Select
+    Range("I2").Select
+      Selection.Copy
+      Range("H2").End(xlDown).Offset(0, 1).Select
+'    Selection.PasteSpecial Paste:=xlPasteFormulas, Operation:=xlNone, _
+'        SkipBlanks:=False, Transpose:=False
+          Range(Selection, Selection.End(xlUp).Offset(1, 0)).Select
+    ActiveSheet.Paste
+   Windows("Daniel.xlsb").Activate
+    sheets("ent").Select
+    Range("M15:P15").Select
+    Selection.Copy
+    Windows("hist_vendas_2024.xlsm").Activate
+    sheets("Historico").Select
+    Range("A1").End(xlDown).Offset(1, 0).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
+        True, Transpose:=False
+    Selection.End(xlDown).Select
+    Selection.End(xlToLeft).Select
+    Range(Selection, Selection.End(xlUp)).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
+        True, Transpose:=False
+Columns("C:C").Select
+    Application.CutCopyMode = False
+    Selection.NumberFormat = "dd/mm/yyyy"
+     Range("I2").Select
+     Range(Selection, Selection.End(xlDown)).Select
+    
+    End If
+        
+    Range("Historico[[#Headers],[Nº Pedido]]").End(xlUp).Offset(1, 0).Select
+    Selection.End(xlDown).Select
+    Selection.Copy
+    Windows("Daniel.xlsb").Activate
+
+    sheets("ent").Select
+    Range("A11").Select
+    ActiveSheet.Paste
+    Windows("hist_vendas_2024.xlsm").Activate
+    
+    Range("Historico[[#Headers],[Cliente]]").End(xlUp).Offset(1, 0).Select
+    Selection.End(xlDown).Select
+    Selection.Copy
+    Windows("Daniel.xlsb").Activate
+
+    sheets("ent").Select
+    Range("B11").Select
+    ActiveSheet.Paste
+    Windows("hist_vendas_2024.xlsm").Activate
+    
+    ActiveWorkbook.Save
+    ActiveWorkbook.Close
+   End If
+
+
+End Sub
