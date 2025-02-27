@@ -1,0 +1,53 @@
+Sub Gravar_novo()
+    Dim Caminho As String, Nome As String
+    Dim wbOriginal As Workbook, wbNovo As Workbook
+    
+    ' Referências aos workbooks
+    Set wbOriginal = ThisWorkbook
+    
+    ' Criar uma cópia da planilha em um novo workbook
+    wbOriginal.Sheets("Pedido").Copy
+    Set wbNovo = ActiveWorkbook
+    
+    ' Converter tudo para valores (remove fórmulas)
+    With wbNovo.Sheets(1)
+        .UsedRange.Value = .UsedRange.Value
+        .Name = "Orçamento"
+    End With
+    
+    ' Salvar o novo workbook
+    Caminho = wbOriginal.Path & Application.PathSeparator
+    Nome = wbNovo.Sheets("Orçamento").Range("A74").Value
+    
+    ' Verificar se o nome do arquivo é válido
+    If Len(Trim(Nome)) > 0 Then
+        wbNovo.SaveAs Filename:=Caminho & Nome & ".xlsx"
+        wbNovo.Close SaveChanges:=False
+    Else
+        MsgBox "Não foi possível salvar o arquivo: nome inválido na célula A74.", vbExclamation
+        wbNovo.Close SaveChanges:=False
+        Exit Sub
+    End If
+    
+    ' Exportar a planilha Pedido original como PDF
+    Caminho = wbOriginal.Path & Application.PathSeparator
+    Nome = wbOriginal.Sheets("entrada").Range("K30").Value
+    
+    ' Verificar se o nome do PDF é válido
+    If Len(Trim(Nome)) > 0 Then
+        wbOriginal.Sheets("Pedido").ExportAsFixedFormat _
+            Type:=xlTypePDF, _
+            Filename:=Caminho & Nome & ".pdf", _
+            Quality:=xlQualityStandard, _
+            IncludeDocProperties:=True, _
+            IgnorePrintAreas:=False, _
+            OpenAfterPublish:=False
+    Else
+        MsgBox "Não foi possível exportar o PDF: nome inválido na célula K30 da planilha 'entrada'.", vbExclamation
+    End If
+    
+    ' Retornar para a planilha de entrada
+    wbOriginal.Sheets("entrada").Select
+    
+    MsgBox "Orçamento concluído com sucesso!", vbInformation
+End Sub
