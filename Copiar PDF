@@ -1,0 +1,48 @@
+Sub Copiar_PDF()
+    ' Macro simplificada
+    ' Exportar apenas a planilha "pedidos" para PDF
+    
+    Dim caminho As String
+    Dim nome As String
+    Dim nomeCompleto As String
+    Dim wsEnt As Worksheet
+    Dim numeroPedido As String
+    Dim nomeCliente As String
+    Dim posicaoHifen As Integer
+    
+    Set wsEnt = Sheets("ent")
+    
+    caminho = "D:\OneDrive\Trabalho\Pedidos\Histórico\"
+    nome = wsEnt.Range("K30").Value2
+    
+    ' Encontrar a posição do hífen que separa o número do pedido e o nome do cliente
+    posicaoHifen = InStr(nome, "-")
+    
+    ' Se encontrou o hífen
+    If posicaoHifen > 0 Then
+        ' Extrair o número do pedido (parte antes do hífen)
+        numeroPedido = Left(nome, posicaoHifen - 1)
+        
+        ' Extrair o nome do cliente (parte depois do hífen)
+        nomeCliente = Mid(nome, posicaoHifen)
+        
+        ' Criar o novo nome com "Pedido " após o número
+        nomeCompleto = numeroPedido & " Pedido" & nomeCliente
+    Else
+        ' Se não tiver hífen, mantém o nome original
+        nomeCompleto = nome
+    End If
+    
+    ' Selecionar apenas a planilha "pedidos"
+    Sheets("pedidos").Select
+    
+    ' Exportar para PDF
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, Filename:=caminho & nomeCompleto, _
+        Quality:=xlQualityStandard, IncludeDocProperties:=True, _
+        IgnorePrintAreas:=False, OpenAfterPublish:=False
+    
+    wsEnt.Select
+    Range("C2").Select
+    
+    MsgBox "PDF da planilha 'pedidos' exportado com sucesso para " & caminho & nomeCompleto, vbInformation, "Concluído"
+End Sub
