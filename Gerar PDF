@@ -70,11 +70,13 @@ Sub PDF()
             Dim targetRow As Long
             targetRow = lastRowF + 1
             
-            ' Copiar valores de C1, C2 e C3 da planilha atual
+            ' Copiar nº pedido, cliente, data e descontos da planilha atual
             .Cells(targetRow, "A").Value = ThisWorkbook.Sheets("ent").Range("M15").Value
             .Cells(targetRow, "B").Value = ThisWorkbook.Sheets("ent").Range("N15").Value
             .Cells(targetRow, "C").Value = ThisWorkbook.Sheets("ent").Range("O15").Value
             .Cells(targetRow, "D").Value = ThisWorkbook.Sheets("ent").Range("P15").Value
+            .Cells(targetRow, "E").Value = ThisWorkbook.Sheets("ent").Range("Q15").Value
+
             ' Copiar a data e formatar como DD/MM/AAAA na coluna C
             Dim dataOriginal As Date
             dataOriginal = ThisWorkbook.Sheets("ent").Range("C3").Value
