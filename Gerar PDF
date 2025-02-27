@@ -1,184 +1,149 @@
 Sub PDF()
-'Gerar ordem de serviço
-Dim Caminho As String
-Dim Nome    As String
-Dim linha   As Long
-
-
-sheets("cach").Select
-   Cells.Select
-   ActiveSheet.Range("$A$3:$C$110").AutoFilter Field:=1
-   ActiveSheet.Range("$A$3:$C$70").AutoFilter Field:=1, Criteria1:="<>"
-    Cells.Select
+    ' Nova macro reorganizada
+    ' Gerar ordem de serviço e copiar dados
     
-sheets("barra").Select
-    Cells.Select
-    ActiveSheet.Range("$A$3:$C$110").AutoFilter Field:=1
-    ActiveSheet.Range("$A$3:$C$70").AutoFilter Field:=1, Criteria1:="<>"
-    Cells.Select
+    Dim caminho As String
+    Dim nome As String
+    Dim wsCach As Worksheet, wsBarra As Worksheet, wsEnt As Worksheet
     
-    If sheets("cach").Range("C2") = 0 And sheets("barra").Range("C2") = 0 Then
- 
-        sheets(Array("pedidos", "exped", "crav" _
-        )).Select
+    Set wsCach = Sheets("cach")
+    Set wsBarra = Sheets("barra")
+    Set wsEnt = Sheets("ent")
     
-'Caminho = ThisWorkbook.Path & Application.PathSeparator
-Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
-Nome = sheets("ent").Range("K30").Value2
-    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
-          Caminho & Nome, Quality:=xlQualityStandard, _
-        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
-        False
+    ' Aplicar filtro na planilha "cach"
+    wsCach.ListObjects("avulso").Range.AutoFilter Field:=2, Criteria1:="<>"
     
-           ElseIf sheets("cach").Range("C2") = 0 Then
-         sheets(Array("pedidos", "exped", "crav", "barra" _
-        )).Select
-    sheets("pedidos").Activate
-'Caminho = ThisWorkbook.Path & Application.PathSeparator
-Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
-Nome = sheets("ent").Range("K30").Value2
-    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
-          Caminho & Nome, Quality:=xlQualityStandard, _
-        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
-        False
-
-ElseIf sheets("barra").Range("C2") = 0 Then
-        sheets(Array("pedidos", "exped", "crav", "cach" _
-        )).Select
-    sheets("pedidos").Activate
-'Caminho = ThisWorkbook.Path & Application.PathSeparator
-Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
-Nome = sheets("ent").Range("K30").Value2
-    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
-          Caminho & Nome, Quality:=xlQualityStandard, _
-        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
-        False
-
-Else
-sheets(Array("pedidos", "exped", "crav", "cach", "barra" _
-        )).Select
+    ' Aplicar filtro na planilha "barra"
+    wsBarra.Range("$A$3:$C$110").AutoFilter Field:=1
+    wsBarra.Range("$A$3:$C$70").AutoFilter Field:=1, Criteria1:="<>"
     
-    sheets("pedidos").Activate
-Range("A1").Select
-'Caminho = ThisWorkbook.Path & Application.PathSeparator
-Caminho = "A:\OneDrive\Trabalho\Pedidos\Histórico" & Application.PathSeparator
-Nome = sheets("ent").Range("K30").Value2
-    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, fileName:= _
-          Caminho & Nome, Quality:=xlQualityStandard, _
-        IncludeDocProperties:=True, IgnorePrintAreas:=False, OpenAfterPublish:= _
-        False
-sheets("ent").Select
-Range("C2").Select
-
-End If
-
-'Fim da ordem de serviço
-sheets("ent").Select
-Range("C2").Select
-
-carryOn = MsgBox("Continuar?", vbYesNo, "Gravar Histórico")
-If carryOn = vbYes Then
-    Workbooks.Open fileName:= _
-    "A:\OneDrive\Documentos\hist_vendas_2024.xlsm"
-       sheets("Historico").Select
-       Range("A1:I1").Select
-    Selection.AutoFilter
-    Range("A1:I1").Select
-    Selection.AutoFilter
-     
-     Windows("Daniel.xlsb").Activate
- sheets("ent").Select
-    If IsEmpty(Range("A16")) Then
-           Range("A15:C15").Select
-    Selection.Copy
-    ActiveWindow.ActivateNext
-    Windows("hist_vendas_2024.xlsm").Activate
-    Range("F1").End(xlDown).Offset(1, 0).Select
-    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
-        True, Transpose:=False
-      Range("I2").Select
-      Selection.Copy
-        Range("H2").End(xlDown).Offset(0, 1).Select
-    Selection.PasteSpecial Paste:=xlPasteFormulas, Operation:=xlNone, _
-        SkipBlanks:=False, Transpose:=False
-        
-    Windows("Daniel.xlsb").Activate
-    sheets("ent").Select
-    Range("m15:q15").Select
-    Selection.Copy
-    Range("C1").Select
-    ActiveWindow.ActivateNext
-   Windows("hist_vendas_2024.xlsm").Activate
-    sheets("Historico").Select
-    Range("A1").End(xlDown).Offset(1, 0).Select
-    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
-        True, Transpose:=False
-
+    caminho = "D:\OneDrive\Trabalho\Pedidos\Histórico\"
+    nome = wsEnt.Range("K30").Value2
+    
+    ' Determinar quais planilhas exportar para PDF
+    If wsCach.Range("C2") = 0 And wsBarra.Range("C2") = 0 Then
+        Sheets(Array("pedidos", "exped", "crav")).Select
+    ElseIf wsCach.Range("C2") = 0 Then
+        Sheets(Array("pedidos", "exped", "crav", "barra")).Select
+    ElseIf wsBarra.Range("C2") = 0 Then
+        Sheets(Array("pedidos", "exped", "crav", "cach")).Select
     Else
-'   Copiar quando tem vários itens
-'      Sheets("entrada").Select
-    Range("A15", Range("A15").End(xlDown).Offset(0, 2)).Select
-    Selection.Copy
-    ActiveWindow.ActivateNext
-    Workbooks.Open fileName:= _
-    "A:\OneDrive\Documentos\hist_vendas_2024.xlsm"
-            sheets("Historico").Select
-    Range("F3").End(xlDown).Offset(1, 0).Select
-    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
-        :=True, Transpose:=False
-    Range("F2").End(xlDown).Offset(1, 0).Select
-    Range("I2").Select
-      Selection.Copy
-      Range("H2").End(xlDown).Offset(0, 1).Select
-'    Selection.PasteSpecial Paste:=xlPasteFormulas, Operation:=xlNone, _
-'        SkipBlanks:=False, Transpose:=False
-          Range(Selection, Selection.End(xlUp).Offset(1, 0)).Select
-    ActiveSheet.Paste
-   Windows("Daniel.xlsb").Activate
-    sheets("ent").Select
-    Range("M15:P15").Select
-    Selection.Copy
-    Windows("hist_vendas_2024.xlsm").Activate
-    sheets("Historico").Select
-    Range("A1").End(xlDown).Offset(1, 0).Select
-    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
-        True, Transpose:=False
-    Selection.End(xlDown).Select
-    Selection.End(xlToLeft).Select
-    Range(Selection, Selection.End(xlUp)).Select
-    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks:= _
-        True, Transpose:=False
-Columns("C:C").Select
-    Application.CutCopyMode = False
-    Selection.NumberFormat = "dd/mm/yyyy"
-     Range("I2").Select
-     Range(Selection, Selection.End(xlDown)).Select
-    
+        Sheets(Array("pedidos", "exped", "crav", "cach", "barra")).Select
     End If
+    
+    ' Exportar para PDF
+    Sheets("pedidos").Activate
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, Filename:=caminho & nome, _
+        Quality:=xlQualityStandard, IncludeDocProperties:=True, _
+        IgnorePrintAreas:=False, OpenAfterPublish:=False
+    
+    wsEnt.Select
+    Range("C2").Select
+    
+    ' Confirmar continuação do processo
+    Dim carryOn As VbMsgBoxResult
+    carryOn = MsgBox("Continuar?", vbYesNo, "Gravar Histórico")
+    
+    If carryOn = vbYes Then
+        ' Caminho completo e exato do arquivo hist_vendas_2025.xlsm
+        Dim historicoPath As String
+        historicoPath = "D:\OneDrive\Documentos\hist_vendas_2025.xlsm"
         
-    Range("Historico[[#Headers],[Nº Pedido]]").End(xlUp).Offset(1, 0).Select
-    Selection.End(xlDown).Select
+        ' Verifica se o arquivo existe antes de tentar abri-lo
+        If Dir(historicoPath) = "" Then
+            MsgBox "Arquivo não encontrado: " & historicoPath, vbCritical, "Erro"
+            Exit Sub
+        End If
+        
+        ' Abrir a pasta de trabalho do histórico
+        Dim wbHistorico As Workbook
+        Set wbHistorico = Workbooks.Open(historicoPath)
+        
+        With wbHistorico.Sheets("Historico")
+            .Range("A1:I1").AutoFilter
+            
+            ' Encontrar a última linha preenchida na coluna F para inserir os novos dados
+            Dim lastRowF As Long
+            lastRowF = .Cells(.Rows.Count, "F").End(xlUp).Row
+            
+            ' Adicionar uma nova linha
+            Dim targetRow As Long
+            targetRow = lastRowF + 1
+            
+            ' Copiar valores de C1, C2 e C3 da planilha atual
+            .Cells(targetRow, "A").Value = ThisWorkbook.Sheets("ent").Range("M15").Value
+            .Cells(targetRow, "B").Value = ThisWorkbook.Sheets("ent").Range("N15").Value
+            .Cells(targetRow, "C").Value = ThisWorkbook.Sheets("ent").Range("O15").Value
+            .Cells(targetRow, "D").Value = ThisWorkbook.Sheets("ent").Range("P15").Value
+            ' Copiar a data e formatar como DD/MM/AAAA na coluna C
+            Dim dataOriginal As Date
+            dataOriginal = ThisWorkbook.Sheets("ent").Range("C3").Value
+            .Cells(targetRow, "C").Value = dataOriginal
+            .Cells(targetRow, "C").NumberFormat = "dd/mm/yyyy"
+            
+            ' Verificar se há dados para copiar da linha A15
+            If Not IsEmpty(wsEnt.Range("A15")) Then
+                Dim lastDataRow As Long
+                
+                ' Determinar a última linha com dados a partir de A15
+                If IsEmpty(wsEnt.Range("A16")) Then
+                    ' Apenas a linha 15 tem dados
+                    ' Copiar dados para as colunas F, G e H (quantidade, produto e valor)
+                    .Cells(targetRow, "F").Value = wsEnt.Range("A15").Value  ' Quantidade na coluna F
+                    .Cells(targetRow, "G").Value = wsEnt.Range("B15").Value  ' Produto na coluna G
+                    .Cells(targetRow, "H").Value = wsEnt.Range("C15").Value  ' Valor na coluna H
+                Else
+                    ' Encontrar a última linha com dados a partir de A15
+                    lastDataRow = wsEnt.Range("A15").End(xlDown).Row
+                    
+                    ' Copiar cada coluna para as colunas de destino corretas
+                    Dim i As Long
+                    For i = 15 To lastDataRow
+                        .Cells(targetRow + (i - 15), "F").Value = wsEnt.Cells(i, "A").Value  ' Quantidade na coluna F
+                        .Cells(targetRow + (i - 15), "G").Value = wsEnt.Cells(i, "B").Value  ' Produto na coluna G
+                        .Cells(targetRow + (i - 15), "H").Value = wsEnt.Cells(i, "C").Value  ' Valor na coluna H
+                    Next i
+                End If
+            End If
+            
+            ' Atualizar lastRowF após adicionar os novos dados
+            lastRowF = .Cells(.Rows.Count, "F").End(xlUp).Row
+            
+            ' Formatar todas as células da coluna C como data DD/MM/AAAA
+            ' desde a primeira linha até a última linha com dados
+            .Range("C1:C" & lastRowF).NumberFormat = "dd/mm/yyyy"
+            
+            ' Preencher células vazias com o último valor preenchido nas colunas A-E e I
+            ' Limitando exatamente até a última linha preenchida da coluna F
+            Dim col As Range, cell As Range, lastFilled As Variant
+            For Each col In .Range("A:A,B:B,C:C,D:D,E:E,I:I").Columns
+                lastFilled = ""
+                For Each cell In .Range(col.Cells(1), col.Cells(lastRowF))
+                    If Not IsEmpty(cell.Value) Then
+                        lastFilled = cell.Value
+                    ElseIf lastFilled <> "" Then
+                        cell.Value = lastFilled
+                    End If
+                Next cell
+            Next col
+            
+            ' Garantir que as alterações sejam salvas
+            wbHistorico.Save
+            wbHistorico.Close SaveChanges:=True
+            
+            MsgBox "Dados salvos com sucesso em " & historicoPath, vbInformation, "Concluído"
+        End With
+        Range("C1").Select
     Selection.Copy
-    Windows("Daniel.xlsb").Activate
-
-    sheets("ent").Select
     Range("A11").Select
-    ActiveSheet.Paste
-    Windows("hist_vendas_2024.xlsm").Activate
-    
-    Range("Historico[[#Headers],[Cliente]]").End(xlUp).Offset(1, 0).Select
-    Selection.End(xlDown).Select
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Range("C2").Select
+    Application.CutCopyMode = False
     Selection.Copy
-    Windows("Daniel.xlsb").Activate
-
-    sheets("ent").Select
     Range("B11").Select
-    ActiveSheet.Paste
-    Windows("hist_vendas_2024.xlsm").Activate
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    End If
     
-    ActiveWorkbook.Save
-    ActiveWorkbook.Close
-   End If
-
-
 End Sub
